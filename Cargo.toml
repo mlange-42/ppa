@@ -14,5 +14,6 @@ name = "ppa"
 path = "src/main.rs"
 
 [dependencies]
+csv = "1.1"
 num-traits = "0.2.11"
 structopt = {version = "0.3", features = ["wrap_help"]} # TODO put CLI in feature

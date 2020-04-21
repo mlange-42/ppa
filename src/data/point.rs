@@ -6,7 +6,45 @@ use std::slice::{Chunks, ChunksMut};
 /// Point collection creation result type
 type Result<T> = std::result::Result<T, PointConstructionError>;
 
+/// Collection of points with ID
+#[derive(Debug)]
+pub struct PointCollection<T>
+where
+    T: Float,
+{
+    points: Points<T>,
+    ids: Option<Vec<String>>,
+}
+
+impl<T> PointCollection<T>
+where
+    T: Float,
+{
+    pub fn points(&self) -> &Points<T> {
+        &self.points
+    }
+}
+
+impl<T> PointCollection<T>
+where
+    T: Float,
+{
+    pub fn new(points: Points<T>, ids: Option<Vec<String>>) -> self::Result<Self> {
+        if let Some(id) = &ids {
+            if points.len() != id.len() {
+                return Err(PointConstructionError(format!(
+                    "Data length ({}) does not match number of IDs ({})",
+                    points.len(),
+                    id.len()
+                )));
+            }
+        }
+        Ok(PointCollection { points, ids })
+    }
+}
+
 /// A collection of n-dimensional float points
+#[derive(Debug)]
 pub struct Points<T>
 where
     T: Float,

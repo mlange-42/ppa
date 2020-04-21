@@ -11,7 +11,7 @@ fn main() {
         env::args().collect()
     };
 
-    let args: Cli = if args.len() == 2 && !args[1].starts_with('-') {
+    let _args: Cli = if args.len() == 2 && !args[1].starts_with('-') {
         let mut content = fs::read_to_string(&args[1]).expect(&format!(
             "Something went wrong reading the options file {:?}",
             &args[1]
