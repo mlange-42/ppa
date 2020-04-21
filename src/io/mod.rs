@@ -1,10 +1,12 @@
+//! IO for point pattern data
 use crate::data::point::PointCollection;
 use num_traits::Float;
 use std::path::PathBuf;
 
 pub mod csv;
 
-trait PointReader<T>
+/// Trait for file readers
+pub trait PointReader<T>
 where
     T: Float,
 {

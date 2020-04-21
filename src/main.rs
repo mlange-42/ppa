@@ -2,6 +2,11 @@ use ppa::cli::Cli;
 use std::{env, fs};
 use structopt::StructOpt;
 
+pub mod cli;
+pub mod command;
+pub mod data;
+pub mod io;
+
 fn main() {
     let test = false;
 

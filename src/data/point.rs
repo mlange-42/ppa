@@ -23,6 +23,9 @@ where
     pub fn points(&self) -> &Points<T> {
         &self.points
     }
+    pub fn ids(&self) -> Option<&Vec<String>> {
+        self.ids.as_ref()
+    }
 }
 
 impl<T> PointCollection<T>
@@ -118,9 +121,6 @@ where
             dim,
         })
     }
-    /*fn index(&self, row: usize) -> usize {
-        row * self.dim
-    }*/
     pub fn len(&self) -> usize {
         self.data.len() / self.dim
     }

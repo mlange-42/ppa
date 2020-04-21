@@ -1,3 +1,4 @@
+//! CSV file IO
 use crate::data::point::{PointCollection, PointConstructionError, Points};
 use crate::io::PointReader;
 use csv::{ReaderBuilder, StringRecord};
@@ -14,6 +15,11 @@ pub struct CsvOptions {
     delimiter: u8,
     no_data: String,
 }
+impl CsvOptions {
+    pub fn new(delimiter: u8, no_data: String) -> Self {
+        CsvOptions { delimiter, no_data }
+    }
+}
 impl Default for CsvOptions {
     fn default() -> Self {
         CsvOptions {
@@ -23,6 +29,7 @@ impl Default for CsvOptions {
     }
 }
 
+/// Reader for CSV point collection files
 pub struct CsvPointReader {
     columns: Vec<String>,
     id_column: Option<String>,
@@ -54,6 +61,7 @@ where
 {
     type ErrorType = CsvError;
 
+    /// Reads a CSV file and parses it into a PointCollection
     fn read(&self, file: &PathBuf) -> CsvResult<PointCollection<T>> {
         let no_data = &self.options.no_data;
 
@@ -83,13 +91,17 @@ where
             }
             for col in &col_indices {
                 let str = rec.get(*col).unwrap();
-                let val = match T::from_str_radix(str, 10) {
-                    Ok(v) => v,
-                    Err(_e) => {
-                        return Err(CsvError::ParseError(format!(
-                            "Unable to parse value '{}' to float.",
-                            str
-                        )))
+                let val = if str == no_data {
+                    T::nan()
+                } else {
+                    match T::from_str_radix(str, 10) {
+                        Ok(v) => v,
+                        Err(_e) => {
+                            return Err(CsvError::ParseError(format!(
+                                "Unable to parse value '{}' to float.",
+                                str
+                            )))
+                        }
                     }
                 };
 
@@ -104,6 +116,7 @@ where
     }
 }
 
+/// Error type for different possible errors during CSV to PointCollection reading.
 #[derive(Debug)]
 pub enum CsvError {
     ColumnError(ColumnIndexError),
@@ -134,7 +147,13 @@ impl From<csv::Error> for CsvError {
 }
 impl fmt::Display for CsvError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.fmt(f)
+        match *self {
+            CsvError::ColumnError(ref e) => e.fmt(f),
+            CsvError::IoError(ref e) => e.fmt(f),
+            CsvError::CsvError(ref e) => e.fmt(f),
+            CsvError::PointError(ref e) => e.fmt(f),
+            CsvError::ParseError(ref str) => f.write_str(str),
+        }
     }
 }
 
@@ -163,5 +182,16 @@ mod test {
 
         assert_eq!(points.points().len(), 25);
         assert_eq!(points.points().dim(), 3);
+
+        for (i, (id, p)) in points
+            .ids()
+            .unwrap()
+            .iter()
+            .zip(points.points().iter())
+            .enumerate()
+        {
+            assert_eq!(p.len(), 3);
+            assert_eq!(id, &format!("{}", i + 1));
+        }
     }
 }

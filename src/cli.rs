@@ -10,6 +10,7 @@ use structopt::StructOpt;
 ///
 /// For more documentation and explanation of the algorithms, see the GitHub page:
 ///      https://mlange-42.github.io/ppa/
+#[allow(dead_code)]
 #[derive(StructOpt)]
 #[structopt(verbatim_doc_comment)]
 pub struct Cli {
@@ -24,6 +25,7 @@ pub struct Cli {
     cmd: Command,
 }
 
+#[allow(dead_code)]
 #[derive(StructOpt)]
 enum Command {
     /// Jaccard similarity between two sets of points
